@@ -1,0 +1,87 @@
+<html lang="ko"> 
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>숫자야구 게임</title>
+    </head>
+    <body>
+        <form id="form">
+            <!-- HTML, input과 form 태그는 주로 같이 사용-->
+            <input type="text" id="input">
+            <button>확인</button>
+        </form>
+        <div id="logs"></div>
+        <script>
+            const $input = document.querySelector('#input');
+            const $form = document.querySelector('#form');
+            const $logs = document.querySelector('#logs');
+
+            const numbers = [];
+            for (let n = 1; n <= 9; n += 1) {
+                numbers.push(n); // 추가
+            }
+
+            const answer = [];
+            for (let n = 0; n <= 3; n += 1) {
+                const index = Math.floor(Math.random() * numbers.length); // 무작위 숫자 => Math 메소드
+                answer.push(numbers[index]);
+                numbers.splice(index, 1);
+            }
+            // numbers [1, 2, 3, 4, 5, 6, 7, 8, 9] answer []
+            console.log(answer);
+
+            const tries = [];
+            function checkInput(input) {
+                if (input.length !== 4) { // 길이는 4인가?
+                    return alert('4자리 숫자를 입력해주세요.');
+                }
+                if (new Set(input).size !== 4) { // 중복된 숫자가 있는가?
+                    return alert('중복되지 않게 입력해주세요.')
+                }
+                if (tries.includes(input)) { // 시도한 값인가?
+                    return alert('이미 시도한 값입니다.');
+                }
+                return true;
+                // 검사하는 코드
+            }
+
+            $form.addEventListener('submit', (event) => {
+                event.preventDefault(); //기본 동작 막기
+                const value = $input.value;
+                $input.value = '';
+
+                if (!checkInput(value)) {
+                    return;
+                }
+                //입력값 문제없음
+                if (answer.join('') === value) {
+                    $logs.textContent = "홈런!";
+                    return;
+                }
+                if (tries.length >= 9) {
+                    const message = document.createTextNode(`패배! 정답은 ${answer.join('')}`);
+                    $logs.appendChild(message);
+                    return;
+                }
+
+                // 스트라이크/볼 검사
+
+                let strike = 0;
+                let ball = 0;
+                for(let i = 0; i<answer.length; i++) {
+                    const index = value.indexOf(answer[i]);
+                    if (index > -1) {
+                        if (index === i) {
+                            strike += 1;
+                        } else {
+                            ball += 1;
+                        }
+                    }
+                }
+                $logs.append(`${value}: ${strike} 스트라이크 ${ball} 볼`, document.createElement('br'));
+                tries.push(value);
+            });  
+        </script>
+    </body>
+</html>
